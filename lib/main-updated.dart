@@ -13,7 +13,7 @@ import 'package:sizer/sizer.dart';
 import '../core/app_export.dart';
 import '../widgets/custom_error_widget.dart';
 
-var backendURL = "https://nomadnest1769back.builtwithrocket.new/log-error";
+var backendURL = "https://httpbin.org/post";
 
 void main() async {
   FlutterError.onError = (details) {
@@ -129,6 +129,19 @@ void _sendOverflowError(FlutterErrorDetails details) {
     final request = html.HttpRequest();
     request.open('POST', backendURL, async: true);
     request.setRequestHeader('Content-Type', 'application/json');
+
+    request.onLoadEnd.listen((_) {
+      if (request.status != 200 && kDebugMode) {
+        print('Failed to report overflow error: ${request.status}');
+      }
+    });
+
+    request.onError.listen((_) {
+      if (kDebugMode) {
+        print('Error sending overflow report');
+      }
+    });
+
     request.send(jsonData);
   } catch (e) {
     // print('Exception while reporting overflow error: $e');
