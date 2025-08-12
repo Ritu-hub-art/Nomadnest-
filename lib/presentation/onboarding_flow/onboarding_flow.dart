@@ -135,12 +135,12 @@ class _OnboardingFlowState extends State<OnboardingFlow>
 
   void _navigateToSignup() {
     HapticFeedback.lightImpact();
-    Navigator.pushReplacementNamed(context, '/signup-screen');
+    Navigator.pushReplacementNamed(context, '/signup');
   }
 
   void _navigateToLogin() {
     HapticFeedback.lightImpact();
-    Navigator.pushReplacementNamed(context, '/login-screen');
+    Navigator.pushReplacementNamed(context, '/login');
   }
 
   void _provideFeedback() {
