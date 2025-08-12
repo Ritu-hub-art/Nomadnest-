@@ -108,7 +108,7 @@ class AppTheme {
           actionsIconTheme: IconThemeData(color: textPrimaryLight, size: 24)),
 
       // Card theme with subtle elevation for spatial hierarchy
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
           color: cardLight,
           elevation: 2,
           shadowColor: shadowLight,
@@ -216,7 +216,7 @@ class AppTheme {
       sliderTheme: SliderThemeData(activeTrackColor: secondaryLight, thumbColor: secondaryLight, overlayColor: secondaryLight.withAlpha(51), inactiveTrackColor: borderLight, trackHeight: 4),
 
       // Tab bar theme for navigation consistency
-      tabBarTheme: TabBarTheme(labelColor: primaryLight, unselectedLabelColor: textSecondaryLight, indicatorColor: secondaryLight, indicatorSize: TabBarIndicatorSize.label, labelStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, letterSpacing: 0.1), unselectedLabelStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w400, letterSpacing: 0.1)),
+      tabBarTheme: TabBarThemeData(labelColor: primaryLight, unselectedLabelColor: textSecondaryLight, indicatorColor: secondaryLight, indicatorSize: TabBarIndicatorSize.label, labelStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, letterSpacing: 0.1), unselectedLabelStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w400, letterSpacing: 0.1)),
 
       // Tooltip theme for helpful guidance
       tooltipTheme: TooltipThemeData(decoration: BoxDecoration(color: textPrimaryLight.withAlpha(230), borderRadius: BorderRadius.circular(8)), textStyle: GoogleFonts.inter(color: cardLight, fontSize: 12, fontWeight: FontWeight.w400), padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
