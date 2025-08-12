@@ -4,12 +4,13 @@ import 'dart:html' as html;
 import 'dart:js_interop';
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:web/web.dart' as web;
 
-var backendURL = "https://nomadnest1769back.builtwithrocket.new/log-inspected-widget";
+var backendURL = "https://httpbin.org/post";
 
 class CustomWidgetInspector extends StatefulWidget {
   final Widget child;
@@ -5068,18 +5069,18 @@ void _sendWidgetInformation(Map<String, dynamic> widgetInfo) {
     request.setRequestHeader('Content-Type', 'application/json');
 
     request.onReadyStateChange.listen((_) {
-      if (request.readyState == html.HttpRequest.DONE) {
-        // if (request.status == 200) {
-        //   print('Successfully reported widgetInfo');
-        // } else {
-        //   print('Error reporting widget information');
-        // }
+      if (request.readyState == html.HttpRequest.DONE && request.status != 200) {
+        if (kDebugMode) {
+          print('Failed to report widget information: ${request.status}');
+        }
       }
     });
 
-    // request.onError.listen((event) {
-    //   print('Failed to send widget information');
-    // });
+    request.onError.listen((_) {
+      if (kDebugMode) {
+        print('Error sending widget information');
+      }
+    });
 
     request.send(jsonData);
   } catch (e) {
