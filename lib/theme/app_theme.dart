@@ -276,7 +276,7 @@ class AppTheme {
               letterSpacing: -0.02),
           iconTheme: IconThemeData(color: textPrimaryDark, size: 24),
           actionsIconTheme: IconThemeData(color: textPrimaryDark, size: 24)),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
           color: cardDark,
           elevation: 2,
           shadowColor: shadowDark,
