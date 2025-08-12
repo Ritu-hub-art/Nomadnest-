@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
-
-import '../../../widgets/custom_icon_widget.dart';
 
 class EmailVerificationWidget extends StatefulWidget {
   final String email;
@@ -28,97 +25,189 @@ class EmailVerificationWidget extends StatefulWidget {
 }
 
 class _EmailVerificationWidgetState extends State<EmailVerificationWidget> {
-  bool _isVerifying = false;
-  List<TextEditingController> _codeControllers = [];
-  List<FocusNode> _focusNodes = [];
+  final List<TextEditingController> _controllers = [];
+  final List<FocusNode> _focusNodes = [];
 
   @override
   void initState() {
     super.initState();
-    // Initialize 6 controllers for 6-digit code
+    // Initialize controllers and focus nodes for 6 digits
     for (int i = 0; i < 6; i++) {
-      _codeControllers.add(TextEditingController());
+      _controllers.add(TextEditingController());
       _focusNodes.add(FocusNode());
     }
+
+    // Listen to changes and update the main controller
+    for (int i = 0; i < 6; i++) {
+      _controllers[i].addListener(() {
+        _updateMainController();
+      });
+    }
+  }
+
+  void _updateMainController() {
+    String code = '';
+    for (var controller in _controllers) {
+      code += controller.text;
+    }
+    widget.verificationCodeController.text = code;
   }
 
   @override
   void dispose() {
-    for (var controller in _codeControllers) {
+    for (var controller in _controllers) {
       controller.dispose();
     }
-    for (var node in _focusNodes) {
-      node.dispose();
+    for (var focusNode in _focusNodes) {
+      focusNode.dispose();
     }
     super.dispose();
   }
 
-  void _onCodeChanged(String value, int index) {
-    if (value.length == 1) {
-      // Move to next field
-      if (index < 5) {
-        _focusNodes[index + 1].requestFocus();
-      } else {
-        // All fields filled, attempt verification
-        _verifyCode();
-      }
-    } else if (value.isEmpty) {
-      // Move to previous field
-      if (index > 0) {
-        _focusNodes[index - 1].requestFocus();
-      }
+  void _onDigitChanged(String value, int index) {
+    if (value.isNotEmpty && index < 5) {
+      _focusNodes[index + 1].requestFocus();
+    } else if (value.isEmpty && index > 0) {
+      _focusNodes[index - 1].requestFocus();
     }
 
-    // Update main controller
-    String fullCode = _codeControllers.map((c) => c.text).join();
-    widget.verificationCodeController.text = fullCode;
-  }
-
-  Future<void> _verifyCode() async {
-    String code = _codeControllers.map((c) => c.text).join();
-
-    if (code.length != 6) {
-      Fluttertoast.showToast(
-        msg: "Please enter the complete 6-digit code",
-        backgroundColor: Theme.of(context).colorScheme.error,
-        textColor: Theme.of(context).colorScheme.onError,
-      );
-      return;
-    }
-
-    setState(() {
-      _isVerifying = true;
-    });
-
-    // Simulate verification
-    await Future.delayed(const Duration(seconds: 2));
-
-    if (mounted) {
-      setState(() {
-        _isVerifying = false;
-      });
-
-      // For demo purposes, accept any 6-digit code
-      HapticFeedback.lightImpact();
-      Fluttertoast.showToast(
-        msg: "Email verified successfully!",
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
-      );
-      widget.onCodeVerified();
+    // Check if all 6 digits are entered
+    if (widget.verificationCodeController.text.length == 6) {
+      widget.onCodeVerified(); // Call verification handler
     }
   }
 
-  void _resendCode() {
-    if (widget.resendCooldown > 0) return;
+  Widget _buildTroubleshootingSection() {
+    return Container(
+      padding: EdgeInsets.all(4.w),
+      margin: EdgeInsets.symmetric(vertical: 3.h),
+      decoration: BoxDecoration(
+        color: Theme.of(context)
+            .colorScheme
+            .surfaceContainerHighest
+            .withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.help_outline,
+                color: Theme.of(context).colorScheme.primary,
+                size: 20,
+              ),
+              SizedBox(width: 2.w),
+              Text(
+                'Not receiving emails?',
+                style: GoogleFonts.inter(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 2.h),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildTroubleshootingTip(
+                'Check your spam/junk folder',
+                'Verification emails sometimes end up in spam',
+              ),
+              _buildTroubleshootingTip(
+                'Verify your email address',
+                'Make sure you entered the correct email',
+              ),
+              _buildTroubleshootingTip(
+                'Wait a few minutes',
+                'Emails can take 2-5 minutes to arrive',
+              ),
+              _buildTroubleshootingTip(
+                'Check your internet connection',
+                'A stable connection is required for email delivery',
+              ),
+            ],
+          ),
+          SizedBox(height: 2.h),
+          Container(
+            padding: EdgeInsets.all(3.w),
+            decoration: BoxDecoration(
+              color: Theme.of(context)
+                  .colorScheme
+                  .primaryContainer
+                  .withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.info_outline,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 18,
+                ),
+                SizedBox(width: 2.w),
+                Expanded(
+                  child: Text(
+                    'Still having trouble? Try the resend button above or contact support.',
+                    style: GoogleFonts.inter(
+                      fontSize: 12.sp,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-    HapticFeedback.lightImpact();
-    widget.onResendCode();
-
-    Fluttertoast.showToast(
-      msg: "Verification code sent to ${widget.email}",
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      textColor: Theme.of(context).colorScheme.onPrimary,
+  Widget _buildTroubleshootingTip(String title, String description) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 1.5.h),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            margin: EdgeInsets.only(top: 0.5.h, right: 2.w),
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary,
+              shape: BoxShape.circle,
+            ),
+          ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.inter(
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.w500,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                Text(
+                  description,
+                  style: GoogleFonts.inter(
+                    fontSize: 12.sp,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -129,30 +218,32 @@ class _EmailVerificationWidgetState extends State<EmailVerificationWidget> {
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 6.w),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(height: 6.h),
+            SizedBox(height: 4.h),
 
-            // Email verification icon
+            // Verification icon
             Container(
-              width: 20.w,
-              height: 20.w,
+              width: 12.h,
+              height: 12.h,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
+                color: Theme.of(context)
+                    .colorScheme
+                    .primary
+                    .withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: Center(
-                child: CustomIconWidget(
-                  iconName: 'mark_email_read',
-                  color: Theme.of(context).colorScheme.primary,
-                  size: 10.w,
-                ),
+              child: Icon(
+                Icons.email_outlined,
+                size: 6.h,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
 
             SizedBox(height: 4.h),
 
             Text(
-              'Check your email',
+              'Verify Your Email',
               style: GoogleFonts.inter(
                 fontSize: 28.sp,
                 fontWeight: FontWeight.w700,
@@ -162,67 +253,64 @@ class _EmailVerificationWidgetState extends State<EmailVerificationWidget> {
 
             SizedBox(height: 2.h),
 
-            Text(
-              'We sent a verification code to',
-              style: GoogleFonts.inter(
-                fontSize: 16.sp,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+            RichText(
+              textAlign: TextAlign.center,
+              text: TextSpan(
+                style: GoogleFonts.inter(
+                  fontSize: 16.sp,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+                children: [
+                  const TextSpan(text: 'We sent a verification code to\n'),
+                  TextSpan(
+                    text: widget.email,
+                    style: GoogleFonts.inter(
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                ],
               ),
             ),
 
-            SizedBox(height: 0.5.h),
+            SizedBox(height: 6.h),
 
-            Text(
-              widget.email,
-              style: GoogleFonts.inter(
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-
-            SizedBox(height: 4.h),
-
-            // Code input fields
+            // 6-digit code input
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: List.generate(6, (index) {
-                return SizedBox(
+                return Container(
                   width: 12.w,
                   height: 6.h,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: _controllers[index].text.isNotEmpty
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context).colorScheme.outline,
+                      width: 2,
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                    color: Theme.of(context).colorScheme.surface,
+                  ),
                   child: TextField(
-                    controller: _codeControllers[index],
+                    controller: _controllers[index],
                     focusNode: _focusNodes[index],
-                    keyboardType: TextInputType.number,
                     textAlign: TextAlign.center,
+                    keyboardType: TextInputType.number,
                     maxLength: 1,
                     style: GoogleFonts.inter(
                       fontSize: 24.sp,
                       fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
-                    decoration: InputDecoration(
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
+                    decoration: const InputDecoration(
                       counterText: '',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: Theme.of(context).colorScheme.outline,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: Theme.of(context).colorScheme.primary,
-                          width: 2,
-                        ),
-                      ),
-                      filled: true,
-                      fillColor: Theme.of(context)
-                          .colorScheme
-                          .surfaceContainerHighest
-                          .withValues(alpha: 0.3),
+                      border: InputBorder.none,
                     ),
-                    onChanged: (value) => _onCodeChanged(value, index),
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    onChanged: (value) => _onDigitChanged(value, index),
                   ),
                 );
               }),
@@ -230,69 +318,70 @@ class _EmailVerificationWidgetState extends State<EmailVerificationWidget> {
 
             SizedBox(height: 4.h),
 
-            // Verify button
+            // Timer and resend
+            if (widget.resendCooldown > 0)
+              Text(
+                'Resend code in ${widget.resendCooldown}s',
+                style: GoogleFonts.inter(
+                  fontSize: 14.sp,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              )
+            else
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Didn't receive the code? ",
+                    style: GoogleFonts.inter(
+                      fontSize: 14.sp,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: widget.onResendCode,
+                    child: Text(
+                      'Resend',
+                      style: GoogleFonts.inter(
+                        fontSize: 14.sp,
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+            SizedBox(height: 3.h),
+
+            // Add troubleshooting section
+            _buildTroubleshootingSection(),
+
+            SizedBox(height: 3.h),
+
+            // Continue button
             SizedBox(
               width: double.infinity,
               height: 6.h,
               child: ElevatedButton(
-                onPressed: _isVerifying ? null : _verifyCode,
+                onPressed: widget.verificationCodeController.text.length == 6
+                    ? widget.onCodeVerified
+                    : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: _isVerifying
-                    ? SizedBox(
-                        width: 5.w,
-                        height: 5.w,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Theme.of(context).colorScheme.onPrimary,
-                          ),
-                        ),
-                      )
-                    : Text(
-                        'Verify Email',
-                        style: GoogleFonts.inter(
-                          fontSize: 16.sp,
-                          color: Theme.of(context).colorScheme.onPrimary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-              ),
-            ),
-
-            SizedBox(height: 3.h),
-
-            // Resend code button
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Didn't receive the code? ",
+                child: Text(
+                  'Verify Email',
                   style: GoogleFonts.inter(
-                    fontSize: 14.sp,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontSize: 16.sp,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                TextButton(
-                  onPressed: widget.resendCooldown > 0 ? null : _resendCode,
-                  child: Text(
-                    widget.resendCooldown > 0
-                        ? 'Resend in ${widget.resendCooldown}s'
-                        : 'Resend',
-                    style: GoogleFonts.inter(
-                      fontSize: 14.sp,
-                      color: widget.resendCooldown > 0
-                          ? Theme.of(context).colorScheme.onSurfaceVariant
-                          : Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
 
             SizedBox(height: 2.h),

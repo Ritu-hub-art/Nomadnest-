@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'dart:js_interop';
 import 'package:web/web.dart' as web;
@@ -6,14 +5,17 @@ import 'dart:async';
 import 'custom_inspector.dart';
 import 'dart:html' as html;
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
 
-import '../core/app_export.dart';
-import '../widgets/custom_error_widget.dart';
+import './services/connectivity_service.dart';
+import './services/environment_service.dart';
+import './services/supabase_service.dart';
+import 'core/app_export.dart';
 
-var backendURL = "https://httpbin.org/post";
+var backendURL = "https://nomadnest1769back.builtwithrocket.new/log-error";
 
 void main() async {
   FlutterError.onError = (details) {
@@ -21,56 +23,69 @@ void main() async {
   };
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 🚨 CRITICAL: Custom error handling - DO NOT REMOVE
-  ErrorWidget.builder = (FlutterErrorDetails details) {
-    return CustomErrorWidget(
-      errorDetails: details,
-    );
-  };
-  // 🚨 CRITICAL: Device orientation lock - DO NOT REMOVE
-  Future.wait([
-    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
-  ]).then((value) {
-    runApp(MyApp());
-  });
+  try {
+    // Initialize environment configuration first
+    await EnvironmentService.initialize();
+
+    // Initialize Supabase with proper environment variables
+    await SupabaseService.instance.initialize();
+
+    // Initialize connectivity service
+    await ConnectivityService().initialize();
+
+    // Set preferred orientations
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  } catch (error) {
+    if (kDebugMode) {
+      print('❌ Initialization error: $error');
+    }
+    // Continue with app launch even if some services fail to initialize
+  }
+
+  runApp(const NomadNestApp());
 }
 
-class MyApp extends StatelessWidget {
+class NomadNestApp extends StatelessWidget {
+  const NomadNestApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Sizer(builder: (context, orientation, screenType) {
-      return MaterialApp(
+    return Sizer(
+      builder: (context, orientation, deviceType) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: const TextScaler.linear(1.0),
+          ),
+          child: MaterialApp(
         navigatorObservers: [trackingRouteObserver1],
 
-        title: 'nomadnest',
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        themeMode: ThemeMode.light,
-        // 🚨 CRITICAL: NEVER REMOVE OR MODIFY
+            title: 'NomadNest',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: ThemeMode.system,
+            initialRoute: AppRoutes.splash,
+            routes: AppRoutes.routes,
+          
         builder: (context, child) {
-        
-        final originalChild = MediaQuery(
-            data: MediaQuery.of(context).copyWith(
-              textScaler: TextScaler.linear(1.0),
+          return CustomWidgetInspector(
+            child: TrackingWidget(
+              child: MediaQuery(
+                data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(1.0)),
+                child: child!,
+              ),
             ),
-            child: child!,
           );
-        return CustomWidgetInspector(
-          child: TrackingWidget(
-            child: originalChild,
-          ),
+        }
+),
         );
       },
-        // 🚨 END CRITICAL SECTION
-        debugShowCheckedModeBanner: false,
-        routes: AppRoutes.routes,
-        initialRoute: AppRoutes.initial,
-      
-);
-    });
+    );
   }
-}
-final ValueNotifier<String> currentPageNotifier = ValueNotifier<String>('');
+}final ValueNotifier<String> currentPageNotifier = ValueNotifier<String>('');
 
 class MyRouteObserver1 extends RouteObserver<PageRoute<dynamic>> {
   void _updateCurrentPage(Route<dynamic>? route) {
@@ -129,19 +144,6 @@ void _sendOverflowError(FlutterErrorDetails details) {
     final request = html.HttpRequest();
     request.open('POST', backendURL, async: true);
     request.setRequestHeader('Content-Type', 'application/json');
-
-    request.onLoadEnd.listen((_) {
-      if (request.status != 200 && kDebugMode) {
-        print('Failed to report overflow error: ${request.status}');
-      }
-    });
-
-    request.onError.listen((_) {
-      if (kDebugMode) {
-        print('Error sending overflow report');
-      }
-    });
-
     request.send(jsonData);
   } catch (e) {
     // print('Exception while reporting overflow error: $e');

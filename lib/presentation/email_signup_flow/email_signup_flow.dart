@@ -7,8 +7,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sizer/sizer.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/app_export.dart';
+import '../../services/auth_service.dart';
 import '../../widgets/logo_widget.dart';
 import '../login_screen/widgets/custom_text_field.dart';
 import '../login_screen/widgets/loading_overlay.dart';
@@ -204,26 +206,46 @@ class _EmailSignupFlowState extends State<EmailSignupFlow>
       _isLoading = true;
     });
 
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      bool success = false;
 
-    setState(() {
-      _isLoading = false;
-    });
+      if (provider == 'Google') {
+        success =
+            await AuthService.instance.signInWithOAuth(OAuthProvider.google);
+      } else if (provider == 'Apple') {
+        success =
+            await AuthService.instance.signInWithOAuth(OAuthProvider.apple);
+      }
 
-    Fluttertoast.showToast(
-        msg: "Welcome to NomadNest via $provider!",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        textColor: Theme.of(context).colorScheme.onPrimary,
-        fontSize: 14.sp);
+      if (success) {
+        Fluttertoast.showToast(
+            msg: "Welcome to NomadNest via $provider!",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            textColor: Theme.of(context).colorScheme.onPrimary,
+            fontSize: 14.sp);
 
-    // Skip to profile setup for social signups
-    setState(() {
-      _currentStep = 2;
-    });
-    _pageController.animateToPage(2,
-        duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
+        // Skip to profile setup for social signups
+        setState(() {
+          _currentStep = 2;
+        });
+        _pageController.animateToPage(2,
+            duration: const Duration(milliseconds: 400),
+            curve: Curves.easeInOut);
+      } else {
+        throw Exception('$provider authentication failed');
+      }
+    } catch (error) {
+      Fluttertoast.showToast(
+          msg: "Failed to sign up with $provider: ${error.toString()}",
+          backgroundColor: Theme.of(context).colorScheme.error,
+          textColor: Theme.of(context).colorScheme.onError);
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   Future<void> _handleEmailSignup() async {
@@ -249,14 +271,162 @@ class _EmailSignupFlowState extends State<EmailSignupFlow>
       _isLoading = true;
     });
 
-    // Simulate signup process
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      // Use AuthService for real Supabase signup
+      final response = await AuthService.instance.signUp(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+        fullName: _emailController.text.split('@').first,
+        displayName: _emailController.text.split('@').first,
+      );
 
+      if (response?.user != null) {
+        Fluttertoast.showToast(
+            msg: "Account created! Check your email for verification code.",
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            textColor: Theme.of(context).colorScheme.onPrimary);
+
+        _nextStep(); // Move to email verification step
+      } else {
+        throw Exception('Failed to create account');
+      }
+    } catch (error) {
+      String errorMessage = 'Failed to create account';
+
+      if (error.toString().contains('already_registered')) {
+        errorMessage = 'An account with this email already exists';
+      } else if (error.toString().contains('weak_password')) {
+        errorMessage = 'Password is too weak';
+      } else if (error.toString().contains('invalid_email')) {
+        errorMessage = 'Invalid email address';
+      }
+
+      Fluttertoast.showToast(
+          msg: errorMessage,
+          backgroundColor: Theme.of(context).colorScheme.error,
+          textColor: Theme.of(context).colorScheme.onError);
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _handleResendCode() async {
     setState(() {
-      _isLoading = false;
+      _isLoading = true;
+      _resendCooldown = 60;
     });
 
-    _nextStep();
+    try {
+      await AuthService.instance
+          .sendVerificationCode(_emailController.text.trim());
+
+      Fluttertoast.showToast(
+          msg: "New verification code sent!",
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          textColor: Theme.of(context).colorScheme.onPrimary);
+
+      // Start cooldown timer
+      Future.doWhile(() async {
+        await Future.delayed(const Duration(seconds: 1));
+        if (mounted) {
+          setState(() {
+            if (_resendCooldown > 0) _resendCooldown--;
+          });
+        }
+        return _resendCooldown > 0;
+      });
+    } catch (error) {
+      Fluttertoast.showToast(
+          msg: "Failed to resend code: ${error.toString()}",
+          backgroundColor: Theme.of(context).colorScheme.error,
+          textColor: Theme.of(context).colorScheme.onError);
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _handleCodeVerification() async {
+    if (_verificationCodeController.text.length != 6) {
+      Fluttertoast.showToast(
+          msg: "Please enter the 6-digit verification code",
+          backgroundColor: Theme.of(context).colorScheme.error,
+          textColor: Theme.of(context).colorScheme.onError);
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final isValid = await AuthService.instance.verifyEmailCode(
+        email: _emailController.text.trim(),
+        code: _verificationCodeController.text,
+      );
+
+      if (isValid) {
+        Fluttertoast.showToast(
+            msg: "Email verified successfully!",
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            textColor: Theme.of(context).colorScheme.onPrimary);
+
+        _nextStep(); // Move to profile setup
+      } else {
+        Fluttertoast.showToast(
+            msg: "Invalid or expired verification code",
+            backgroundColor: Theme.of(context).colorScheme.error,
+            textColor: Theme.of(context).colorScheme.onError);
+      }
+    } catch (error) {
+      Fluttertoast.showToast(
+          msg: "Verification failed: ${error.toString()}",
+          backgroundColor: Theme.of(context).colorScheme.error,
+          textColor: Theme.of(context).colorScheme.onError);
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _handleProfileComplete() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Update user profile with collected information
+      final success = await AuthService.instance.updateUserProfile(
+        fullName: _displayNameController.text.isNotEmpty
+            ? _displayNameController.text
+            : _emailController.text.split('@').first,
+        displayName: _displayNameController.text.isNotEmpty
+            ? _displayNameController.text
+            : _emailController.text.split('@').first,
+        bio: _bioController.text.isNotEmpty ? _bioController.text : null,
+        city: _selectedCity,
+        languages: _selectedLanguages.isNotEmpty ? _selectedLanguages : null,
+      );
+
+      if (success) {
+        _nextStep(); // Move to success screen
+      } else {
+        throw Exception('Failed to update profile');
+      }
+    } catch (error) {
+      Fluttertoast.showToast(
+          msg: "Profile update failed: ${error.toString()}",
+          backgroundColor: Theme.of(context).colorScheme.error,
+          textColor: Theme.of(context).colorScheme.onError);
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   void _onPasswordStrengthChanged(String strength) {
@@ -575,22 +745,8 @@ class _EmailSignupFlowState extends State<EmailSignupFlow>
                         email: _emailController.text,
                         verificationCodeController: _verificationCodeController,
                         resendCooldown: _resendCooldown,
-                        onResendCode: () {
-                          setState(() {
-                            _resendCooldown = 60;
-                          });
-                          // Start cooldown timer
-                          Future.doWhile(() async {
-                            await Future.delayed(const Duration(seconds: 1));
-                            if (mounted) {
-                              setState(() {
-                                if (_resendCooldown > 0) _resendCooldown--;
-                              });
-                            }
-                            return _resendCooldown > 0;
-                          });
-                        },
-                        onCodeVerified: _nextStep),
+                        onResendCode: _handleResendCode,
+                        onCodeVerified: _handleCodeVerification),
                     ProfileSetupWizardWidget(
                         displayNameController: _displayNameController,
                         bioController: _bioController,
@@ -617,7 +773,7 @@ class _EmailSignupFlowState extends State<EmailSignupFlow>
                             _selectedLanguages = languages;
                           });
                         },
-                        onComplete: _nextStep),
+                        onComplete: _handleProfileComplete),
                     SignupSuccessWidget(
                         userEmail: _emailController.text,
                         userName: _displayNameController.text.isEmpty

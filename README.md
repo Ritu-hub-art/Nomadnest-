@@ -1,142 +1,127 @@
-# Flutter
+# NomadNest - Digital Nomad Community Platform
 
-A modern Flutter-based mobile application utilizing the latest mobile development technologies and tools for building responsive cross-platform applications.
+## 📧 Email Verification Setup
 
-## 📋 Prerequisites
+### Required Configuration
 
-- Flutter SDK (^3.29.2)
-- Dart SDK
-- Android Studio / VS Code with Flutter extensions
-- Android SDK / Xcode (for iOS development)
+To enable email verification functionality, you need to configure the Resend API key:
 
-## 🛠️ Installation
+#### Step 1: Get Resend API Key
+1. Sign up at [resend.com](https://resend.com) (free tier: 3,000 emails/month)
+2. Create an API key with sending permissions
+3. Copy the API key (format: `re_xxxxxxxxxx`)
 
-1. Install dependencies:
-```bash
-flutter pub get
-```
+#### Step 2: Configure Environment Variables
 
-2. Run the application:
-
-To run the app with environment variables defined in an env.json file, follow the steps mentioned below:
-1. Through CLI
-    ```bash
-    flutter run --dart-define-from-file=env.json
-    ```
-2. For VSCode
-    - Open .vscode/launch.json (create it if it doesn't exist).
-    - Add or modify your launch configuration to include --dart-define-from-file:
-    ```json
-    {
-        "version": "0.2.0",
-        "configurations": [
-            {
-                "name": "Launch",
-                "request": "launch",
-                "type": "dart",
-                "program": "lib/main.dart",
-                "args": [
-                    "--dart-define-from-file",
-                    "env.json"
-                ]
-            }
-        ]
-    }
-    ```
-3. For IntelliJ / Android Studio
-    - Go to Run > Edit Configurations.
-    - Select your Flutter configuration or create a new one.
-    - Add the following to the "Additional arguments" field:
-    ```bash
-    --dart-define-from-file=env.json
-    ```
-
-## 📁 Project Structure
-
-```
-flutter_app/
-├── android/            # Android-specific configuration
-├── ios/                # iOS-specific configuration
-├── lib/
-│   ├── core/           # Core utilities and services
-│   │   └── utils/      # Utility classes
-│   ├── presentation/   # UI screens and widgets
-│   │   └── splash_screen/ # Splash screen implementation
-│   ├── routes/         # Application routing
-│   ├── theme/          # Theme configuration
-│   ├── widgets/        # Reusable UI components
-│   └── main.dart       # Application entry point
-├── assets/             # Static assets (images, fonts, etc.)
-├── pubspec.yaml        # Project dependencies and configuration
-└── README.md           # Project documentation
-```
-
-## 🧩 Adding Routes
-
-To add new routes to the application, update the `lib/routes/app_routes.dart` file:
-
-```dart
-import 'package:flutter/material.dart';
-import 'package:package_name/presentation/home_screen/home_screen.dart';
-
-class AppRoutes {
-  static const String initial = '/';
-  static const String home = '/home';
-
-  static Map<String, WidgetBuilder> routes = {
-    initial: (context) => const SplashScreen(),
-    home: (context) => const HomeScreen(),
-    // Add more routes as needed
-  }
+**Option A: Update env.json (Recommended)**
+```json
+{
+  "SUPABASE_URL": "your_supabase_url",
+  "SUPABASE_ANON_KEY": "your_supabase_anon_key", 
+  "RESEND_API_KEY": "re_your_actual_resend_api_key_here"
 }
 ```
 
-## 🎨 Theming
+**Option B: Supabase Dashboard**
+1. Go to your Supabase project dashboard
+2. Settings → Edge Functions → Environment Variables
+3. Add: `RESEND_API_KEY` = `re_your_actual_resend_api_key_here`
 
-This project includes a comprehensive theming system with both light and dark themes:
-
-```dart
-// Access the current theme
-ThemeData theme = Theme.of(context);
-
-// Use theme colors
-Color primaryColor = theme.colorScheme.primary;
-```
-
-The theme configuration includes:
-- Color schemes for light and dark modes
-- Typography styles
-- Button themes
-- Input decoration themes
-- Card and dialog themes
-
-## 📱 Responsive Design
-
-The app is built with responsive design using the Sizer package:
-
-```dart
-// Example of responsive sizing
-Container(
-  width: 50.w, // 50% of screen width
-  height: 20.h, // 20% of screen height
-  child: Text('Responsive Container'),
-)
-```
-## 📦 Deployment
-
-Build the application for production:
-
+**Option C: Supabase CLI**
 ```bash
-# For Android
-flutter build apk --release
-
-# For iOS
-flutter build ios --release
+supabase secrets set RESEND_API_KEY=re_your_actual_resend_api_key_here
 ```
 
-## 🙏 Acknowledgments
-- Built with [Rocket.new](https://rocket.new)
-- Powered by [Flutter](https://flutter.dev) & [Dart](https://dart.dev)
-- Styled with Material Design
+#### Step 3: Test Email Verification
+1. Run the app and attempt to sign up
+2. Check your email (including spam folder)
+3. Enter the 6-digit verification code
+4. Complete your profile setup
 
-Built with ❤️ on Rocket.new
+### Troubleshooting Email Issues
+
+**Common Problems:**
+- **"Email service not configured"** → Add RESEND_API_KEY to Supabase environment
+- **"Authentication failed"** → Verify your Resend API key is correct
+- **"Too many requests"** → Wait a moment and try again (rate limiting)
+
+**Email Not Received:**
+1. Check spam/junk folder
+2. Verify email address is correct
+3. Wait 2-5 minutes for delivery
+4. Try resending the code
+5. Check internet connection
+
+### Email Features
+- ✅ Professional welcome emails with NomadNest branding
+- ✅ 6-digit verification codes with 10-minute expiry
+- ✅ Mobile-responsive email templates
+- ✅ Automatic code cleanup and security
+- ✅ Rate limiting and error handling
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Flutter 3.6.0 or higher
+- Dart 3.0 or higher
+- Supabase account with project
+- Resend account with API key
+
+### Installation
+```bash
+# Clone the repository
+git clone [repository-url]
+cd nomadnest
+
+# Install dependencies
+flutter pub get
+
+# Configure environment variables (see above)
+
+# Run the app
+flutter run
+```
+
+## 🔧 Development
+
+### Environment Configuration
+The app uses `env.json` for environment variables. Make sure to:
+1. Never commit real API keys to version control
+2. Use the provided template structure
+3. Validate all required keys are present
+
+### Database Schema
+The app includes a complete Supabase schema with:
+- User profiles and authentication
+- Email verification system
+- Role-based access control
+- Real-time subscriptions
+
+## 📱 Features
+
+### Core Features
+- 🔐 Secure authentication with email verification
+- 👤 Complete user profile management
+- 🌍 Interactive maps and location services
+- 💬 Real-time messaging system
+- 🛡️ Safety companion features
+- 📱 Responsive design for all screen sizes
+
+### Technical Features
+- 📧 Production-ready email system
+- 🔒 Row Level Security (RLS) policies
+- 📊 Real-time data synchronization
+- 🎨 Custom UI components
+- 🌐 Cross-platform compatibility
+
+## 📞 Support
+
+If you encounter issues with email verification:
+1. Check the troubleshooting section above
+2. Verify your environment configuration
+3. Check Supabase Edge Function logs
+4. Review Resend dashboard for delivery status
+
+---
+
+Built with Flutter 💙 and Supabase ⚡

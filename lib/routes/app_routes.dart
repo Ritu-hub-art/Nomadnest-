@@ -17,6 +17,7 @@ import '../presentation/city_guide_detail/city_guide_detail.dart';
 import '../presentation/interactive_map/interactive_map.dart';
 import '../presentation/safety_settings/safety_settings.dart';
 import '../presentation/account_management/account_management.dart';
+import '../widgets/diagnostics_screen.dart';
 
 class AppRoutes {
   static const String initial = '/';
@@ -37,6 +38,7 @@ class AppRoutes {
   static const String interactiveMap = '/interactive-map';
   static const String safetySettings = '/safety-settings';
   static const String accountManagement = '/account-management';
+  static const String diagnostics = '/diagnostics';
 
   static Map<String, WidgetBuilder> routes = {
     initial: (context) => const SplashScreen(),
@@ -57,5 +59,6 @@ class AppRoutes {
     interactiveMap: (context) => const InteractiveMap(),
     safetySettings: (context) => const SafetySettings(),
     accountManagement: (context) => const AccountManagement(),
+    diagnostics: (context) => const DiagnosticsScreen(),
   };
 }

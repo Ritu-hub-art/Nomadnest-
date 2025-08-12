@@ -135,9 +135,9 @@ class _SplashScreenState extends State<SplashScreen>
       // Check if user has completed onboarding
       final bool hasCompletedOnboarding = _checkOnboardingStatus();
       if (hasCompletedOnboarding) {
-        Navigator.pushReplacementNamed(context, '/login-screen');
+        Navigator.pushReplacementNamed(context, '/login');
       } else {
-        Navigator.pushReplacementNamed(context, '/onboarding-flow');
+        Navigator.pushReplacementNamed(context, '/onboarding');
       }
     }
   }
