@@ -558,16 +558,16 @@ class _UserProfileState extends State<UserProfile>
           SettingsSectionWidget(
             isOwnProfile: _isOwnProfile,
             onPrivacyPressed: () {
-              // Navigate to privacy settings
+              Navigator.pushNamed(context, AppRoutes.privacyControlsSettings);
             },
             onNotificationPressed: () {
-              // Navigate to notification settings
+              Navigator.pushNamed(context, AppRoutes.notificationSettings);
             },
             onSafetyPressed: () {
               Navigator.pushNamed(context, '/safety-companion');
             },
             onAccountPressed: () {
-              // Navigate to account management
+              Navigator.pushNamed(context, AppRoutes.accountManagement);
             },
             onLogoutPressed: _handleLogout,
           ),
