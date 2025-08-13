@@ -228,8 +228,8 @@ class _SplashScreenState extends State<SplashScreen>
       end: Alignment.bottomRight,
       colors: [
         AppTheme.lightTheme.colorScheme.primary,
-        AppTheme.lightTheme.colorScheme.primary.withValues(alpha: 0.8),
-        AppTheme.lightTheme.colorScheme.secondary.withValues(alpha: 0.9),
+        AppTheme.lightTheme.colorScheme.primary.withOpacity(alpha: 0.8),
+        AppTheme.lightTheme.colorScheme.secondary.withOpacity(alpha: 0.9),
       ],
       stops: const [0.0, 0.6, 1.0],
     ),
