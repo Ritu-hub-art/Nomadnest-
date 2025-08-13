@@ -67,3 +67,18 @@ flutter_icons:
   image_path: assets/images/logo.png
   adaptive_icon_background: "#FFFFFF"
   adaptive_icon_foreground: assets/images/logo.png
+
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: assets/images/logo.png
+  # Fine-tuned for iOS/Android
+  android: true
+  ios: true
+  web: false
+  android_12:
+    color: "#FFFFFF"
+    image: assets/images/logo.png
+  # Optional branding image (disabled by default)
+  # branding: assets/images/brand_mark.png
+  fullscreen: true
+
