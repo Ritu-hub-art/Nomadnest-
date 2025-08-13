@@ -259,7 +259,7 @@ class _SplashScreenState extends State<SplashScreen>
   ),
 ),
       
-        child: SafeArea(
+        body: SafeArea(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
