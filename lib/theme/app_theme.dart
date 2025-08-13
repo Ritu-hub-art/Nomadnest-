@@ -216,10 +216,8 @@ class AppTheme {
       sliderTheme: SliderThemeData(activeTrackColor: secondaryLight, thumbColor: secondaryLight, overlayColor: secondaryLight.withAlpha(51), inactiveTrackColor: borderLight, trackHeight: 4),
 
       // Tab bar theme for navigation consistency
-      tabBarTheme: TabBarThemeData(labelColor: primaryLight, unselectedLabelColor: textSecondaryLight, indicator: const UnderlineTabIndicator(
-    borderSide: BorderSide(color: secondaryLight, width: 2),
+      tabBarTheme: TabBarThemeData(labelColor: primaryLight, unselectedLabelColor: textSecondaryLight, indicator: const UnderlineTabIndicator(borderSide: BorderSide(color: secondaryLight, width: 2),
   ), indicatorSize: TabBarIndicatorSize.label, labelStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, letterSpacing: 0.1), unselectedLabelStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w400, letterSpacing: 0.1)),
-
       // Tooltip theme for helpful guidance
       tooltipTheme: TooltipThemeData(decoration: BoxDecoration(color: textPrimaryLight.withAlpha(230), borderRadius: BorderRadius.circular(8)), textStyle: GoogleFonts.inter(color: cardLight, fontSize: 12, fontWeight: FontWeight.w400), padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
 
