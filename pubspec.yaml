@@ -25,7 +25,7 @@ dependencies:
   fl_chart: ^0.65.0
   camera: ^0.10.5+5
   image_picker: ^1.0.4
-  permission_handler: ^11.1.0
+  permission_handler: ^12.0.1
   
   # Networking and environment support
   flutter_dotenv: ^5.2.1
@@ -33,6 +33,12 @@ dependencies:
   
   # Supabase integration
   supabase_flutter: ^2.9.1
+  
+  # Live location and Google Maps dependencies
+  google_maps_flutter: ^2.12.3
+  location: ^8.0.1
+  geolocator: ^14.0.2
+  web_socket_channel: ^3.0.3
 
 dev_dependencies:
   flutter_test:    # 🚨 CRITICAL: Required for Flutter project testing - DO NOT REMOVE

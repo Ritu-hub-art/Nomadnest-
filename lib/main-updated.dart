@@ -23,6 +23,20 @@ void main() async {
   };
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Initialize Supabase
+  try {
+    await SupabaseService.instance.initialize();
+  } catch (e) {
+    debugPrint('Failed to initialize Supabase: $e');
+  }
+
+  // Initialize Supabase
+  try {
+    await SupabaseService.instance.initialize();
+  } catch (e) {
+    debugPrint('Failed to initialize Supabase: $e');
+  }
+
   try {
     // Initialize environment configuration first
     await EnvironmentService.initialize();

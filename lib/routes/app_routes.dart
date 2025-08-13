@@ -19,6 +19,9 @@ import '../presentation/safety_settings/safety_settings.dart';
 import '../presentation/account_management/account_management.dart';
 import '../presentation/privacy_controls_settings/privacy_controls_settings.dart';
 import '../presentation/notification_settings/notification_settings.dart';
+import '../presentation/live_location_sharing_hub/live_location_sharing_hub.dart';
+import '../presentation/interactive_hangout_map/interactive_hangout_map.dart';
+import '../presentation/venue_picker_navigation/venue_picker_navigation.dart';
 import '../widgets/diagnostics_screen.dart';
 
 class AppRoutes {
@@ -42,6 +45,9 @@ class AppRoutes {
   static const String accountManagement = '/account-management';
   static const String privacyControlsSettings = '/privacy-controls-settings';
   static const String notificationSettings = '/notification-settings';
+  static const String liveLocationSharingHub = '/live-location-sharing-hub';
+  static const String interactiveHangoutMap = '/interactive-hangout-map';
+  static const String venuePickerNavigation = '/venue-picker-navigation';
   static const String diagnostics = '/diagnostics';
 
   static Map<String, WidgetBuilder> routes = {
@@ -65,6 +71,9 @@ class AppRoutes {
     accountManagement: (context) => const AccountManagement(),
     privacyControlsSettings: (context) => const PrivacyControlsSettings(),
     notificationSettings: (context) => const NotificationSettings(),
+    liveLocationSharingHub: (context) => const LiveLocationSharingHub(),
+    interactiveHangoutMap: (context) => const InteractiveHangoutMap(),
+    venuePickerNavigation: (context) => const VenuePickerNavigation(),
     diagnostics: (context) => const DiagnosticsScreen(),
   };
 }
