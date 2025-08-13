@@ -59,3 +59,10 @@ flutter:
   # - THIS PROJECT USES GOOGLE FONTS INSTEAD OF LOCAL FONTS
   # - DO NOT ADD ANY LOCAL FONTS SECTION OR FONT FILES
   # - ALL FONTS MUST COME FROM google_fonts: package
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: assets/images/logo.png
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: assets/images/logo.png
