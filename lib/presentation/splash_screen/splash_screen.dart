@@ -220,20 +220,45 @@ class _SplashScreenState extends State<SplashScreen>
 
     return Scaffold(
       body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppTheme.lightTheme.colorScheme.primary,
-              AppTheme.lightTheme.colorScheme.primary.withValues(alpha: 0.8),
-              AppTheme.lightTheme.colorScheme.secondary.withValues(alpha: 0.9),
-            ],
-            stops: const [0.0, 0.6, 1.0],
+  width: double.infinity,
+  height: double.infinity,
+  decoration: BoxDecoration(
+    gradient: LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        AppTheme.lightTheme.colorScheme.primary,
+        AppTheme.lightTheme.colorScheme.primary.withValues(alpha: 0.8),
+        AppTheme.lightTheme.colorScheme.secondary.withValues(alpha: 0.9),
+      ],
+      stops: const [0.0, 0.6, 1.0],
+    ),
+  ),
+  child: SafeArea(
+    child: Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 180, // adjust as you like
+            child: Image.asset(
+              'assets/images/logo.png',
+              fit: BoxFit.contain,
+            ),
           ),
-        ),
+          const SizedBox(height: 12),
+          // (Optional) tagline
+          // Text(
+          //   'Hosting the world, one nest at a time',
+          //   style: Theme.of(context).textTheme.labelMedium,
+          //   textAlign: TextAlign.center,
+          // ),
+        ],
+      ),
+    ),
+  ),
+),
+      
         child: SafeArea(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
