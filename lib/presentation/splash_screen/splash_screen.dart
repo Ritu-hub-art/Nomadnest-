@@ -105,34 +105,25 @@ class _SplashScreenState extends State<SplashScreen>
 
   Future<bool> _checkAuthenticationStatus() async {
     // Simulate authentication check
-    // In real implementation, check stored tokens/credentials
     return false; // Assuming user is not authenticated for demo
   }
 
   Future<void> _loadUserPreferences() async {
-    // Simulate loading user preferences
-    // In real implementation, load from SharedPreferences or secure storage
     await Future.delayed(const Duration(milliseconds: 200));
   }
 
   Future<void> _requestLocationPermissions() async {
-    // Simulate location permission request
-    // In real implementation, use permission_handler package
     await Future.delayed(const Duration(milliseconds: 300));
   }
 
   Future<void> _prepareCachedMapData() async {
-    // Simulate preparing cached map data
-    // In real implementation, check and update offline map tiles
     await Future.delayed(const Duration(milliseconds: 400));
   }
 
   void _navigateToNextScreen(bool isAuthenticated) {
     if (isAuthenticated) {
-      // Navigate to home dashboard for authenticated users
       Navigator.pushReplacementNamed(context, '/home-dashboard');
     } else {
-      // Check if user has completed onboarding
       final bool hasCompletedOnboarding = _checkOnboardingStatus();
       if (hasCompletedOnboarding) {
         Navigator.pushReplacementNamed(context, '/login');
@@ -143,8 +134,6 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   bool _checkOnboardingStatus() {
-    // Simulate checking onboarding completion status
-    // In real implementation, check SharedPreferences
     return false; // Assuming first-time user for demo
   }
 
@@ -208,7 +197,6 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    // Set system UI overlay style
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -219,38 +207,46 @@ class _SplashScreenState extends State<SplashScreen>
     );
 
     return Scaffold(
-  body: Container(
-    width: double.infinity,
-    height: double.infinity,
-    decoration: BoxDecoration(
-      gradient: LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          AppTheme.lightTheme.colorScheme.primary,
-          AppTheme.lightTheme.colorScheme.primary.withOpacity(0.8),
-          AppTheme.lightTheme.colorScheme.secondary.withOpacity(0.9),
-        ],
-        stops: const [0.0, 0.6, 1.0],
-      ),
-    ),
-    child: SafeArea(
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 180,
-              child: Image.asset(
-                'assets/images/logo.png',
-                fit: BoxFit.contain,
-              ),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppTheme.lightTheme.colorScheme.primary,
+              AppTheme.lightTheme.colorScheme.primary.withOpacity(0.8),
+              AppTheme.lightTheme.colorScheme.secondary.withOpacity(0.9),
+            ],
+            stops: const [0.0, 0.6, 1.0],
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 180,
+                  child: Image.asset(
+                    'assets/images/logo.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // Optional tagline
+                // Text(
+                //   'Hosting the world, one nest at a time',
+                //   style: Theme.of(context).textTheme.labelMedium,
+                //   textAlign: TextAlign.center,
+                // ),
+              ],
             ),
-            const SizedBox(height: 12),
-            // Optional tagline...
-          ],
+          ),
         ),
       ),
-    ),
-  ),
-); // <-- closes Scaffold
+    );
+  }
+}
+
