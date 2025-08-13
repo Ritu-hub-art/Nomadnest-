@@ -108,7 +108,7 @@ class AppTheme {
           actionsIconTheme: IconThemeData(color: textPrimaryLight, size: 24)),
 
       // Card theme with subtle elevation for spatial hierarchy
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
           color: cardLight,
           elevation: 2,
           shadowColor: shadowLight,
