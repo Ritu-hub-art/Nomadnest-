@@ -11,7 +11,7 @@ android {
     defaultConfig {
         applicationId "com.example.nomadnest"
 
-        // Explicit versioning — avoids missing flutterVersionCode/flutterVersionName
+        // ✅ Explicit versioning (do NOT use flutterVersionCode/flutterVersionName)
         versionCode 1
         versionName "1.0.0"
 
@@ -19,6 +19,7 @@ android {
         targetSdk 34
         multiDexEnabled true
 
+        // Optional: pass your Google Maps key from env/gradle.properties
         manifestPlaceholders = [
             MAPS_API_KEY: System.getenv("MAPS_API_KEY") ?: (project.findProperty("MAPS_API_KEY") ?: "")
         ]
