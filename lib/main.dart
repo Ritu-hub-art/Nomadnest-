@@ -1,77 +1,46 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:sizer/sizer.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-import './services/connectivity_service.dart';
-import './services/environment_service.dart';
-import './services/supabase_service.dart';
-import 'core/app_export.dart';
-
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Supabase
-  try {
-    await SupabaseService.instance.initialize();
-  } catch (e) {
-    debugPrint('Failed to initialize Supabase: $e');
-  }
+  await Supabase.initialize(
+    url: 'https://YOUR-SUPABASE-URL.supabase.co', // 🔹 Replace with your Supabase Project URL
+    anonKey: 'YOUR-ANON-PUBLIC-KEY',              // 🔹 Replace with your Supabase anon public key
+  );
 
-  // Initialize Supabase
-  try {
-    await SupabaseService.instance.initialize();
-  } catch (e) {
-    debugPrint('Failed to initialize Supabase: $e');
-  }
-
-  try {
-    // Initialize environment configuration first
-    await EnvironmentService.initialize();
-
-    // Initialize Supabase with proper environment variables
-    await SupabaseService.instance.initialize();
-
-    // Initialize connectivity service
-    await ConnectivityService().initialize();
-
-    // Set preferred orientations
-    await SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
-  } catch (error) {
-    if (kDebugMode) {
-      print('❌ Initialization error: $error');
-    }
-    // Continue with app launch even if some services fail to initialize
-  }
-
-  runApp(const NomadNestApp());
+  runApp(const MyApp());
 }
 
-class NomadNestApp extends StatelessWidget {
-  const NomadNestApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Sizer(
-      builder: (context, orientation, deviceType) {
-        return MediaQuery(
-          data: MediaQuery.of(context).copyWith(
-            textScaler: const TextScaler.linear(1.0),
-          ),
-          child: MaterialApp(
-            title: 'NomadNest',
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: ThemeMode.system,
-            initialRoute: AppRoutes.splash,
-            routes: AppRoutes.routes,
-          ),
-        );
-      },
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Nomad Nest',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const HomeScreen(),
+    );
+  }
+}
+
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Nomad Nest'),
+      ),
+      body: const Center(
+        child: Text('Welcome to Nomad Nest!'),
+      ),
     );
   }
 }
