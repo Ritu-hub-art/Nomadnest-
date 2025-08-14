@@ -1,46 +1,77 @@
+// lib/main.dart
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'auth/auth_page.dart';
+import 'home/home_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Supabase
+  // 🔧 Replace with your real Supabase values
   await Supabase.initialize(
-    url: 'https://YOUR-SUPABASE-URL.supabase.co', // 🔹 Replace with your Supabase Project URL
-    anonKey: 'YOUR-ANON-PUBLIC-KEY',              // 🔹 Replace with your Supabase anon public key
+    url: 'https://YOUR-SUPABASE-URL.supabase.co',
+    anonKey: 'YOUR-ANON-PUBLIC-KEY',
   );
 
-  runApp(const MyApp());
+  runApp(const NomadNestApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class NomadNestApp extends StatelessWidget {
+  const NomadNestApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
       title: 'Nomad Nest',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        useMaterial3: true,
+        colorSchemeSeed: Colors.blue,
       ),
-      home: const HomeScreen(),
+      home: const AuthGate(),
     );
   }
 }
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+/// Shows either Home or Auth based on current session and reacts to auth changes.
+class AuthGate extends StatefulWidget {
+  const AuthGate({super.key});
+
+  @override
+  State<AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<AuthGate> {
+  final _supabase = Supabase.instance.client;
+  late final Stream<AuthState> _authStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _authStream = _supabase.auth.onAuthStateChange;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Nomad Nest'),
-      ),
-      body: const Center(
-        child: Text('Welcome to Nomad Nest!'),
-      ),
+    final session = _supabase.auth.currentSession;
+
+    return StreamBuilder<AuthState>(
+      stream: _authStream,
+      initialData: session == null
+          ? const AuthState(AuthChangeEvent.signedOut, null)
+          : AuthState(AuthChangeEvent.signedIn, session),
+      builder: (context, snapshot) {
+        final authState = snapshot.data;
+
+        // If no session -> show Auth
+        if (authState?.session == null) {
+          return const AuthPage();
+        }
+
+        // If user exists but not verified, we *still* let them reach Home,
+        // but Home shows a banner prompting verification status.
+        return const HomePage();
+      },
     );
   }
 }
