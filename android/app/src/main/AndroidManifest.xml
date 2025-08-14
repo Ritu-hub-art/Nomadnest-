@@ -44,7 +44,7 @@
             </intent-filter>
         </activity>
 
-        <!-- Don't delete: used by Flutter tooling -->
+        <!-- Used by Flutter tooling -->
         <meta-data
             android:name="flutterEmbedding"
             android:value="2"/>
@@ -58,3 +58,4 @@
         </intent>
     </queries>
 </manifest>
+
