@@ -1,16 +1,51 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'auth/auth_page.dart';
-import 'home/home_page.dart';
+import 'package:flutter/services.dart';
+import 'package:sizer/sizer.dart';
 
-Future<void> main() async {
+import './services/connectivity_service.dart';
+import './services/environment_service.dart';
+import './services/supabase_service.dart';
+import 'core/app_export.dart';
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 🔧 Replace with your real Supabase values (Dashboard → Project Settings → API)
-  await Supabase.initialize(
-    url: 'https://YOUR-SUPABASE-URL.supabase.co',
-    anonKey: 'YOUR-ANON-PUBLIC-KEY',
-  );
+  // Initialize Supabase
+  try {
+    await SupabaseService.instance.initialize();
+  } catch (e) {
+    debugPrint('Failed to initialize Supabase: $e');
+  }
+
+  // Initialize Supabase
+  try {
+    await SupabaseService.instance.initialize();
+  } catch (e) {
+    debugPrint('Failed to initialize Supabase: $e');
+  }
+
+  try {
+    // Initialize environment configuration first
+    await EnvironmentService.initialize();
+
+    // Initialize Supabase with proper environment variables
+    await SupabaseService.instance.initialize();
+
+    // Initialize connectivity service
+    await ConnectivityService().initialize();
+
+    // Set preferred orientations
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  } catch (error) {
+    if (kDebugMode) {
+      print('❌ Initialization error: $error');
+    }
+    // Continue with app launch even if some services fail to initialize
+  }
 
   runApp(const NomadNestApp());
 }
@@ -20,53 +55,23 @@ class NomadNestApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Nomad Nest',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorSchemeSeed: Colors.blue,
-      ),
-      home: const AuthGate(),
-    );
-  }
-}
-
-class AuthGate extends StatefulWidget {
-  const AuthGate({super.key});
-
-  @override
-  State<AuthGate> createState() => _AuthGateState();
-}
-
-class _AuthGateState extends State<AuthGate> {
-  final _sb = Supabase.instance.client;
-  late final Stream<AuthState> _authStream;
-
-  @override
-  void initState() {
-    super.initState();
-    _authStream = _sb.auth.onAuthStateChange;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final session = _sb.auth.currentSession;
-
-    return StreamBuilder<AuthState>(
-      stream: _authStream,
-      initialData: session == null
-          ? AuthState(AuthChangeEvent.signedOut, null)
-          : AuthState(AuthChangeEvent.signedIn, session),
-      builder: (context, snapshot) {
-        final authState = snapshot.data;
-
-        if (authState?.session == null) {
-          return const AuthPage();
-        }
-        return const HomePage();
+    return Sizer(
+      builder: (context, orientation, deviceType) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: const TextScaler.linear(1.0),
+          ),
+          child: MaterialApp(
+            title: 'NomadNest',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: ThemeMode.system,
+            initialRoute: AppRoutes.splash,
+            routes: AppRoutes.routes,
+          ),
+        );
       },
     );
   }
 }
-

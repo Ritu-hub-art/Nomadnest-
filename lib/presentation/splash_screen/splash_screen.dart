@@ -105,25 +105,34 @@ class _SplashScreenState extends State<SplashScreen>
 
   Future<bool> _checkAuthenticationStatus() async {
     // Simulate authentication check
+    // In real implementation, check stored tokens/credentials
     return false; // Assuming user is not authenticated for demo
   }
 
   Future<void> _loadUserPreferences() async {
+    // Simulate loading user preferences
+    // In real implementation, load from SharedPreferences or secure storage
     await Future.delayed(const Duration(milliseconds: 200));
   }
 
   Future<void> _requestLocationPermissions() async {
+    // Simulate location permission request
+    // In real implementation, use permission_handler package
     await Future.delayed(const Duration(milliseconds: 300));
   }
 
   Future<void> _prepareCachedMapData() async {
+    // Simulate preparing cached map data
+    // In real implementation, check and update offline map tiles
     await Future.delayed(const Duration(milliseconds: 400));
   }
 
   void _navigateToNextScreen(bool isAuthenticated) {
     if (isAuthenticated) {
+      // Navigate to home dashboard for authenticated users
       Navigator.pushReplacementNamed(context, '/home-dashboard');
     } else {
+      // Check if user has completed onboarding
       final bool hasCompletedOnboarding = _checkOnboardingStatus();
       if (hasCompletedOnboarding) {
         Navigator.pushReplacementNamed(context, '/login');
@@ -134,6 +143,8 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   bool _checkOnboardingStatus() {
+    // Simulate checking onboarding completion status
+    // In real implementation, check SharedPreferences
     return false; // Assuming first-time user for demo
   }
 
@@ -197,6 +208,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Set system UI overlay style
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -216,37 +228,152 @@ class _SplashScreenState extends State<SplashScreen>
             end: Alignment.bottomRight,
             colors: [
               AppTheme.lightTheme.colorScheme.primary,
-              AppTheme.lightTheme.colorScheme.primary.withOpacity(0.8),
-              AppTheme.lightTheme.colorScheme.secondary.withOpacity(0.9),
+              AppTheme.lightTheme.colorScheme.primary.withValues(alpha: 0.8),
+              AppTheme.lightTheme.colorScheme.secondary.withValues(alpha: 0.9),
             ],
             stops: const [0.0, 0.6, 1.0],
           ),
         ),
         child: SafeArea(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 180,
-                  child: Image.asset(
-                    'assets/images/logo.png',
-                    fit: BoxFit.contain,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Logo section with animation
+              Expanded(
+                flex: 3,
+                child: Center(
+                  child: AnimatedBuilder(
+                    animation: _animationController,
+                    builder: (context, child) {
+                      return Transform.scale(
+                        scale: _scaleAnimation.value,
+                        child: Opacity(
+                          opacity: _fadeAnimation.value,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Custom NomadNest logo
+                              Container(
+                                width: 30.w,
+                                height: 30.w,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color:
+                                          Colors.black.withValues(alpha: 0.2),
+                                      blurRadius: 20,
+                                      offset: const Offset(0, 10),
+                                    ),
+                                  ],
+                                ),
+                                padding: EdgeInsets.all(2.w),
+                                child: LogoWidget(
+                                  width: 26.w,
+                                  height: 26.w,
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                              SizedBox(height: 3.h),
+                              // App name
+                              Text(
+                                'NomadNest',
+                                style: AppTheme
+                                    .lightTheme.textTheme.displaySmall
+                                    ?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: -0.5,
+                                ),
+                              ),
+                              SizedBox(height: 1.h),
+                              // App tagline
+                              Text(
+                                'Hosting the World, One Nest at a Time',
+                                style: AppTheme.lightTheme.textTheme.titleMedium
+                                    ?.copyWith(
+                                  color: Colors.white.withValues(alpha: 0.9),
+                                  fontWeight: FontWeight.w400,
+                                  letterSpacing: 0.5,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
-                const SizedBox(height: 12),
-                // Optional tagline
-                // Text(
-                //   'Hosting the world, one nest at a time',
-                //   style: Theme.of(context).textTheme.labelMedium,
-                //   textAlign: TextAlign.center,
-                // ),
-              ],
-            ),
+              ),
+
+              // Loading section
+              Expanded(
+                flex: 1,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Loading indicator
+                    if (_isInitializing) ...[
+                      SizedBox(
+                        width: 8.w,
+                        height: 8.w,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 3,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white.withValues(alpha: 0.8),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 2.h),
+                    ],
+
+                    // Status text
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      child: Text(
+                        _initializationStatus,
+                        key: ValueKey(_initializationStatus),
+                        style:
+                            AppTheme.lightTheme.textTheme.bodyMedium?.copyWith(
+                          color: Colors.white.withValues(alpha: 0.8),
+                          fontWeight: FontWeight.w400,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Bottom section with version info
+              Padding(
+                padding: EdgeInsets.only(bottom: 4.h),
+                child: Column(
+                  children: [
+                    Text(
+                      'Version 1.0.0',
+                      style: AppTheme.lightTheme.textTheme.bodySmall?.copyWith(
+                        color: Colors.white.withValues(alpha: 0.6),
+                        fontSize: 10.sp,
+                      ),
+                    ),
+                    SizedBox(height: 0.5.h),
+                    Text(
+                      'Travel safely with verified hosts',
+                      style: AppTheme.lightTheme.textTheme.bodySmall?.copyWith(
+                        color: Colors.white.withValues(alpha: 0.6),
+                        fontSize: 10.sp,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 }
-

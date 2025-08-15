@@ -1,42 +1,18 @@
-plugins {
-    id "com.android.application"
-    id "kotlin-android"
-    id "dev.flutter.flutter-gradle-plugin"
-}
-
-android {
-    namespace "com.example.nomadnest"
-    compileSdk 34
-
-    defaultConfig {
-        applicationId "com.example.nomadnest"
-
-        // ✅ Set these explicitly so Gradle doesn't look for flutterVersionCode/flutterVersionName
-        versionCode 1
-        versionName "1.0.0"
-
-        minSdk 24
-        targetSdk 34
-        multiDexEnabled true
-
-        // Google Maps API key pulled from env var or gradle.properties (no crash if missing)
-        manifestPlaceholders = [
-            MAPS_API_KEY: System.getenv("MAPS_API_KEY") ?: (project.findProperty("MAPS_API_KEY") ?: "")
-        ]
-    }
-
-    buildTypes {
-        release {
-            signingConfig signingConfigs.debug
-            minifyEnabled false
-            shrinkResources false
-        }
-        debug {
-            signingConfig signingConfigs.debug
-        }
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
     }
 }
 
-dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+rootProject.buildDir = '../build'
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    project.evaluationDependsOn(':app')
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
 }
