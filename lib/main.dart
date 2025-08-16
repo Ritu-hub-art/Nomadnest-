@@ -6,31 +6,18 @@ import 'package:sizer/sizer.dart';
 import './services/connectivity_service.dart';
 import './services/environment_service.dart';
 import './services/supabase_service.dart';
+import './supabase_client.dart';
 import 'core/app_export.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Supabase
-  try {
-    await SupabaseService.instance.initialize();
-  } catch (e) {
-    debugPrint('Failed to initialize Supabase: $e');
-  }
-
-  // Initialize Supabase
-  try {
-    await SupabaseService.instance.initialize();
-  } catch (e) {
-    debugPrint('Failed to initialize Supabase: $e');
-  }
-
   try {
     // Initialize environment configuration first
     await EnvironmentService.initialize();
 
-    // Initialize Supabase with proper environment variables
-    await SupabaseService.instance.initialize();
+    // Initialize Supabase with PKCE authentication flow
+    await initSupabase();
 
     // Initialize connectivity service
     await ConnectivityService().initialize();

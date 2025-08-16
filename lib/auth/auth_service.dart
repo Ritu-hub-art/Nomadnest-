@@ -1,18 +1,22 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../services/environment_service.dart';
 
 class AuthService {
   static final SupabaseClient _sb = Supabase.instance.client;
 
+  /// Sign up with email verification deep link
   static Future<void> signUp({
     required String email,
     required String password,
-    String? emailRedirectTo, // optional deep link or landing page
+    String? emailRedirectTo,
   }) async {
     try {
+      final redirectTo = emailRedirectTo ?? '${EnvironmentService.appScheme}://auth/verify';
+      
       await _sb.auth.signUp(
         email: email,
         password: password,
-        emailRedirectTo: emailRedirectTo,
+        emailRedirectTo: redirectTo,
       );
     } on AuthException catch (e) {
       throw Exception(e.message);

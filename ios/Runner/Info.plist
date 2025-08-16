@@ -43,6 +43,18 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- Deep link URL scheme for email verification -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>nomadnest.deep.link</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.nomadnest.app</string>
+			</array>
+		</dict>
+	</array>
 	<key>NSAppTransportSecurity</key>
     <dict>
         <key>NSAllowsArbitraryLoads</key>
