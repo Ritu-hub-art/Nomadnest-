@@ -1,0 +1,9 @@
+# Gradle properties for local development
+# Copy this file to gradle.properties and update with your actual values
+
+# Google Maps API Key
+# Get this from Google Cloud Console: https://console.cloud.google.com/apis/credentials
+MAPS_API_KEY=your_google_maps_api_key_here
+
+# Note: Never commit your actual gradle.properties file to version control
+# Add gradle.properties to your .gitignore if it's not already there

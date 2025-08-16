@@ -52,6 +52,9 @@ class EnvironmentService {
   // Email Service Configuration
   static String get resendApiKey => _getEnvVar('RESEND_API_KEY');
 
+  // Google Maps Configuration
+  static String get mapsApiKey => _getEnvVar('MAPS_API_KEY');
+
   // API Configuration
   static String get apiBaseUrl => _getEnvVar('API_BASE_URL');
   static int get apiTimeout =>
@@ -85,4 +88,6 @@ class EnvironmentService {
   static bool get isValidConfiguration =>
       supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty;
   static bool get hasEmailService => resendApiKey.isNotEmpty;
+  static bool get hasGoogleMaps => mapsApiKey.isNotEmpty;
+}Empty;
 }
