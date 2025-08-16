@@ -7,7 +7,12 @@ class LogoWidget extends StatelessWidget {
   final double? height;
   final BoxFit fit;
 
-  const LogoWidget({Key? key, this.width, this.height, this.fit = BoxFit.contain}) : super(key: key);
+  const LogoWidget({
+    Key? key,
+    this.width,
+    this.height,
+    this.fit = BoxFit.contain,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
