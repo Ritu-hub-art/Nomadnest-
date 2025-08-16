@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class EnvironmentService {
   static bool _initialized = false;
@@ -11,7 +12,19 @@ class EnvironmentService {
     if (_initialized) return;
 
     try {
-      // Load env.json file
+      // Try to load .env file first (preferred method with flutter_dotenv)
+      try {
+        await dotenv.load(fileName: '.env');
+        _initialized = true;
+        _validateEnvironment();
+        return;
+      } catch (e) {
+        if (kDebugMode) {
+          print('Info: .env file not found, falling back to env.json: $e');
+        }
+      }
+
+      // Fallback to env.json file for backward compatibility
       final String envString = await rootBundle.loadString('env.json');
       _envVars = json.decode(envString);
       _initialized = true;
@@ -20,7 +33,7 @@ class EnvironmentService {
       _validateEnvironment();
     } catch (e) {
       if (kDebugMode) {
-        print('Warning: Failed to load env.json file: $e');
+        print('Warning: Failed to load environment configuration: $e');
       }
       _initialized = true; // Continue with defaults
     }
@@ -46,8 +59,11 @@ class EnvironmentService {
   }
 
   // Supabase Configuration
-  static String get supabaseUrl => _getEnvVar('SUPABASE_URL');
-  static String get supabaseAnonKey => _getEnvVar('SUPABASE_ANON_KEY');
+  static String get supabaseUrl => dotenv.maybeGet('SUPABASE_URL') ?? _getEnvVar('SUPABASE_URL');
+  static String get supabaseAnonKey => dotenv.maybeGet('SUPABASE_ANON_KEY') ?? _getEnvVar('SUPABASE_ANON_KEY');
+  
+  // Deep link scheme
+  static String get appScheme => dotenv.maybeGet('APP_SCHEME') ?? _getEnvVar('APP_SCHEME', fallback: 'com.nomadnest.app');
 
   // Email Service Configuration
   static String get resendApiKey => _getEnvVar('RESEND_API_KEY');
