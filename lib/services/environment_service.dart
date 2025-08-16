@@ -89,5 +89,4 @@ class EnvironmentService {
       supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty;
   static bool get hasEmailService => resendApiKey.isNotEmpty;
   static bool get hasGoogleMaps => mapsApiKey.isNotEmpty;
-}Empty;
 }
