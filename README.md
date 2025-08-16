@@ -1,5 +1,11 @@
 # NomadNest - Digital Nomad Community Platform
 
+## 🗺️ Google Maps Setup
+
+This app includes live location features and interactive maps. To enable Google Maps on Android:
+
+👉 **[Follow the Google Maps Setup Guide](GOOGLE_MAPS_SETUP.md)** for detailed instructions on configuring API keys securely.
+
 ## 📧 Email Verification Setup
 
 ### Required Configuration
@@ -77,6 +83,7 @@ cd nomadnest
 flutter pub get
 
 # Configure environment variables (see above)
+# Configure Google Maps API key (see GOOGLE_MAPS_SETUP.md)
 
 # Run the app
 flutter run

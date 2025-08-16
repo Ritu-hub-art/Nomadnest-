@@ -6,6 +6,10 @@
          FlutterApplication and put your custom class here. -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    
+    <!-- Location permissions for Google Maps -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <application
             android:label="nomadnest"
@@ -44,6 +48,10 @@
         <meta-data
                 android:name="flutterEmbedding"
                 android:value="2"/>
+        <!-- Google Maps API Key -->
+        <meta-data
+                android:name="com.google.android.geo.API_KEY"
+                android:value="${MAPS_API_KEY}"/>
     </application>
     <queries>
         <intent>

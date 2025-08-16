@@ -30,6 +30,11 @@ android {
         versionName = flutter.versionName
         multiDexEnabled true
         minSdkVersion 23
+
+        // Manifest placeholders for secure API key handling
+        manifestPlaceholders = [
+            MAPS_API_KEY: project.findProperty('MAPS_API_KEY') ?: System.getenv('MAPS_API_KEY') ?: 'YOUR_API_KEY_HERE'
+        ]
     }
 
     buildTypes {
